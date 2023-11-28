@@ -1,44 +1,31 @@
-version: '3'
+version: "3"
 services:
-  postgres: #דיבי
-    image: 'postgres:latest'
-    environment: #משתנה שיכיל את הסיסמא
-      - POSTGRES_PASSWORD=postgres_password
-  redis: # גם דיבי
-    image: 'redis:latest'
-  nginx:
-    restart: always
-    build:
-      dockerfile: Dockerfile.dev
-      context: ./nginx
-    ports:
-      - '3050:80'
-  api:
-    build: 
-      dockerfile: Dockerfile.dev
-      context: ./server
-    volumes:
-      - /app/node_modules # תיקיה שהוא לא יגע בה
-      - ./server:/app # ממפה את התיקיית בית שהגדרנו לקונטיינר לתיקיה הזרת במחשב בשלי
-    environment:
-      - REDIS_HOST=redis # זה רק רדיס כי זה איך שהגדרנו את השם של הרדיס פה בקובץ
-      - REDIS_PORT=6379 # פורט דיפולטי
-      - PGUSER=postgres
-      - PGHOST=postgres
-      - PGDATABASE=postgres
-      - PGPASSWORD=postgres_password
-      - PGPORT=5432
   client:
-    build: 
-      dockerfile: Dockerfile.dev
-      context: ./client
-    volumes:
-      - /app/node_modules
-      - ./client:/app
+    image: "bengoren/multi-client"
+    mem_limit: 128m
+    hostname: client
+  server:
+    image: "bengoren/multi-server"
+    mem_limit: 128m
+    hostname: api
+    environment:
+      - REDIS_HOST=$REDIS_HOST
+      - REDIS_PORT=$REDIS_PORT
+      - PGUSER=$PGUSER
+      - PGHOST=$PGHOST
+      - PGDATABASE=$PGDATABASE
+      - PGPASSWORD=$PGPASSWORD
+      - PGPORT=$PGPORT
   worker:
-    build: 
-      dockerfile: Dockerfile.dev
-      context: ./worker
-    volumes:
-      - /app/node_modules
-      - ./worker:/app
+    image: "bengoren/multi-worker"
+    mem_limit: 128m
+    hostname: worker
+    environment:
+      - REDIS_HOST=$REDIS_HOST
+      - REDIS_PORT=$REDIS_PORT
+  nginx:
+    image: "bengoren/multi-nginx"
+    mem_limit: 128m
+    hostname: nginx
+    ports:
+      - "80:80"

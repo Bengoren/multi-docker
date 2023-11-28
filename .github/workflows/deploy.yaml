@@ -22,3 +22,13 @@ jobs:
      - run: docker push bengoren/multi-nginx
      - run: docker push bengoren/multi-server
      - run: docker push bengoren/multi-worker
+
+     - name: deploy to EB
+       uses: einaregilsson/beanstalk-deploy@v18
+       with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_KEY }}
+          application_name: multi-docker
+          environment_name: MultiDocker-env
+          existing_bucket_name: elasticbeanstalk-us-east-2-874410852557
+          region: us-east-1
