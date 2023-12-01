@@ -24,7 +24,7 @@ jobs:
      - run: docker push bengoren/multi-worker
 
      - name: Generate deployment package
-       run: zip -r deploy.zip . -x '*.git*' -x ".Dockerrun.aws.json"
+       run: zip -r deploy.zip . -x '*.git*'
 
      - name: deploy to EB
        uses: einaregilsson/beanstalk-deploy@v18
